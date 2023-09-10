@@ -5,9 +5,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Event {
-    String caseId;
-    String activityName;
-    Date timestamp;
+    private final String caseId;
+    private final String activityName;
+    private final Date timestamp;
     // Date format is used to parse a String timestamp into Date
     // This can change according to the timestamp format of the event log
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
