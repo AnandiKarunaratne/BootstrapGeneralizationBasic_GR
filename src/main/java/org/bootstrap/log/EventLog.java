@@ -1,4 +1,4 @@
-package org.bootstrap;
+package org.bootstrap.log;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

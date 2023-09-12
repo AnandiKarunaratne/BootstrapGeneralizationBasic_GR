@@ -1,4 +1,4 @@
-package org.bootstrap;
+package org.bootstrap.log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
