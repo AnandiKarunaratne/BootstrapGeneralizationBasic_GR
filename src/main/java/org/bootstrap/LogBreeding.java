@@ -51,12 +51,12 @@ public class LogBreeding {
      * @return trace obtained from crossover
      */
     private String breedTraces(String t1, String t2, int k, Site site) {
-        int prefixEnd = site.p1 + k - 1;
-        int suffixStart = site.p2 + k;
+        int prefixLength = site.p1 + k - 1;
+        int suffixLength = site.p2 + k;
 
         // Extract the prefix and suffix substrings
-        String prefix = t1.substring(0, prefixEnd);
-        String suffix = t2.substring(suffixStart - 1);
+        String prefix = t1.substring(0, prefixLength);
+        String suffix = t2.substring(t2.length() - suffixLength + 1);
 
         // Concatenate the prefix and suffix
         return prefix + suffix;
