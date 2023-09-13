@@ -1,6 +1,7 @@
 package org.bootstrap;
 
 import org.bootstrap.log.EventLog;
+import org.bootstrap.model.Model;
 
 import java.util.*;
 
@@ -9,12 +10,14 @@ public class BootstrapGen {
     private final int numberOfSamples;
     private List<String> log;
     private String logSamplingMethod;
+    private Map<String, List<String>> model;
 
-    public BootstrapGen(int sampleSize, int numberOfSamples, EventLog eventLog, String logSamplingMethod) {
+    public BootstrapGen(int sampleSize, int numberOfSamples, List<String> traces, String logSamplingMethod, Model model) {
         this.sampleSize = sampleSize;
         this.numberOfSamples = numberOfSamples;
-        this.log = eventLog.getTraceList();
+        this.log = traces;
         this.logSamplingMethod = logSamplingMethod;
+        this.model = model.getModel();
     }
 
     /**
@@ -25,10 +28,12 @@ public class BootstrapGen {
     public double calculateBootstrapGen() {
         double genValueOfSample;
         double genValuesSum = 0;
+        Generalization generalization = new Generalization();
 
         List<String> estimatedPopulation = estimatePopulation();
         for (int i = 0; i < numberOfSamples; i++) {
-            genValueOfSample = calculateGeneralization(generateSample(estimatedPopulation));
+            genValueOfSample = generalization.calculateEntropyRecall(model, generateSample(estimatedPopulation));
+//            genValueOfSample = generalization.calculateModelLogRecall(model, generateSample(estimatedPopulation));
             genValuesSum = genValuesSum + genValueOfSample;
         }
         return genValuesSum / numberOfSamples;
@@ -43,9 +48,9 @@ public class BootstrapGen {
         if (logSamplingMethod == LogSamplingMethod.NON_PARAMETRIC) {
             return log;
         } else if (logSamplingMethod == LogSamplingMethod.SEMI_PARAMETRIC) {
-            int g = 10;
+            int g = 10000;
             int k = 2;
-            double p = 0.5;
+            double p = 1.0;
 
             List<String>[] G = new ArrayList[g + 1];
             G[0] = new ArrayList<>(log);
