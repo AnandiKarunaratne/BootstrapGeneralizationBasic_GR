@@ -7,19 +7,16 @@ import java.util.Map;
 
 public class Model {
 
-    private Map<String, List<String>> model = new HashMap<>();
+    private final Map<String, List<String>> model = new HashMap<>();
 
     private void createSampleModel() {
-        addNode("i");
         addNode("a");
         addNode("b");
         addNode("c");
         addNode("d");
         addNode("e");
         addNode("f");
-        addNode("o");
 
-        addEdge("i", "a");
         addEdge("a", "b");
         addEdge("a", "d");
         addEdge("b", "c");
@@ -28,7 +25,6 @@ public class Model {
         addEdge("e", "e");
         addEdge("e", "f");
         addEdge("f", "a");
-        addEdge("f", "o");
     }
 
     public void addNode(String node) {
@@ -46,6 +42,27 @@ public class Model {
     public Map<String, List<String>> getModel() {
         createSampleModel();
         return model;
+    }
+
+    public double[][] getModelAsMatrix() {
+        createSampleModel();
+        int vertexCount = model.size();
+        String[] nodes = model.keySet().toArray(new String[vertexCount]);
+        double[][] adjacencyMatrix = new double[vertexCount][vertexCount];
+
+        for (int i = 0; i < vertexCount; i++) {
+            String vertex1 = nodes[i];
+            for (int j = 0; j < vertexCount; j++) {
+                String vertex2 = nodes[j];
+                List<String> neighbors = model.get(vertex1);
+                if (neighbors.contains(vertex2)) {
+                    adjacencyMatrix[i][j] = 1;
+                } else {
+                    adjacencyMatrix[i][j] = 0;
+                }
+            }
+        }
+        return adjacencyMatrix;
     }
 
 }
