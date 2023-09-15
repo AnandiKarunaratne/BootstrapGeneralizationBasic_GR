@@ -11,7 +11,9 @@ public class EventLog {
     private final List<Event> eventLog = new ArrayList<>();
     private final List<String> traceList = new ArrayList<>();
 
-    public EventLog() {}
+    public EventLog() {
+        generateSampleTraces();
+    }
 
     public EventLog(String csvFile) {
         preProcessCSV(csvFile);
@@ -71,20 +73,17 @@ public class EventLog {
         }
     }
 
-    public List<String> getTraceList() {
-        return traceList;
+    private void generateSampleTraces() {
+        for (int i = 0; i < 5; i++) { traceList.add("abbbcf"); }
+        for (int i = 0; i < 20; i++) { traceList.add("abcf"); }
+        for (int i = 0; i < 10; i++) { traceList.add("adeef"); }
+        for (int i = 0; i < 10; i++) { traceList.add("adefabcfadef"); }
+        for (int i = 0; i < 20; i++) { traceList.add("adef"); }
+        traceList.add("addef");
     }
 
-    public List<String> getSampleTraceList() {
-        List<String> sampleTraceList = new ArrayList<>();
-        for (int i = 0; i < 5; i++) { sampleTraceList.add("abbbcf"); }
-        for (int i = 0; i < 20; i++) { sampleTraceList.add("abcf"); }
-        for (int i = 0; i < 10; i++) { sampleTraceList.add("adeef"); }
-        for (int i = 0; i < 10; i++) { sampleTraceList.add("adefabcfadef"); }
-        for (int i = 0; i < 20; i++) { sampleTraceList.add("adef"); }
-        sampleTraceList.add("addef");
-
-        return sampleTraceList;
+    public List<String> getTraceList() {
+        return traceList;
     }
 
 }

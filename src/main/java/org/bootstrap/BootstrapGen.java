@@ -9,15 +9,17 @@ public class BootstrapGen {
     private final int sampleSize;
     private final int numberOfSamples;
     private final List<String> log;
-    private final String logSamplingMethod;
+    private final LogSamplingMethod logSamplingMethod;
     private final Model model;
+    private final GeneralizationMeasure generalizationMeasure;
 
-    public BootstrapGen(int sampleSize, int numberOfSamples, EventLog eventLog, String logSamplingMethod, Model model) {
+    public BootstrapGen(int sampleSize, int numberOfSamples, EventLog eventLog, LogSamplingMethod logSamplingMethod, Model model, GeneralizationMeasure generalizationMeasure) {
         this.sampleSize = sampleSize;
         this.numberOfSamples = numberOfSamples;
-        this.log = eventLog.getSampleTraceList();
+        this.log = eventLog.getTraceList();
         this.logSamplingMethod = logSamplingMethod;
         this.model = model;
+        this.generalizationMeasure = generalizationMeasure;
     }
 
     /**
@@ -25,24 +27,25 @@ public class BootstrapGen {
      *
      * @return bootstrap generalization value
      */
-    public double[] calculateBootstrapGen() {
-        double genValueOfSample1;
-        double genValueOfSample2;
-        double genValuesSum1 = 0;
-        double genValuesSum2 = 0;
-        double[] genValues = new double[2];
+    public double calculateBootstrapGen() {
+        double genValueOfSample = 0;
+        double genValuesSum = 0;
         Generalization generalization = new Generalization();
-
         List<String> estimatedPopulation = estimatePopulation();
+
         for (int i = 0; i < numberOfSamples; i++) {
-            genValueOfSample1 = generalization.calculateEntropyRecall(model.getModel(), generateSample(estimatedPopulation));
-            genValueOfSample2 = generalization.calculateEntropyPrecision(model, generateSample(estimatedPopulation));
-            genValuesSum1 = genValuesSum1 + genValueOfSample1;
-            genValuesSum2 = genValuesSum2 + genValueOfSample2;
+            List<String> sample = generateSample(estimatedPopulation);
+
+            if (generalizationMeasure == GeneralizationMeasure.RECALL) {
+                genValueOfSample = generalization.calculateRecall(model.getModel(), sample);
+            } else if (generalizationMeasure == GeneralizationMeasure.ENTROPY_RECALL) {
+                genValueOfSample = generalization.calculateEntropyRecall(model.getModel(), sample);
+            } else if (generalizationMeasure == GeneralizationMeasure.ENTROPY_PRECISION) {
+                genValueOfSample = generalization.calculateEntropyPrecision(model, sample);
+            }
+            genValuesSum = genValuesSum + genValueOfSample;
         }
-        genValues[0] = genValuesSum1 / numberOfSamples;
-        genValues[1] = genValuesSum2 / numberOfSamples;
-        return genValues;
+        return genValuesSum / numberOfSamples;
     }
 
     /**
@@ -51,10 +54,10 @@ public class BootstrapGen {
      * @return estimated trace list
      */
     List<String> estimatePopulation() {
-        if (logSamplingMethod.equals(LogSamplingMethod.NON_PARAMETRIC)) {
+        if (logSamplingMethod == LogSamplingMethod.NON_PARAMETRIC) {
             return log;
-        } else if (logSamplingMethod.equals(LogSamplingMethod.SEMI_PARAMETRIC)) {
-            int g = 10000;
+        } else if (logSamplingMethod == LogSamplingMethod.SEMI_PARAMETRIC) {
+            int g = 1;
             int k = 2;
             double p = 1.0;
 

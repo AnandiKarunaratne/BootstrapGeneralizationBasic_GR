@@ -4,17 +4,17 @@ import org.bootstrap.log.EventLog;
 import org.bootstrap.model.Model;
 
 public class Main {
-    final private static int sampleSize = 10000; // n
-    final private static int numberOfSamples = 100; // m
-    final private static String eventLogFile = "/Users/anandi/Downloads/sampleData.csv";
-    final private static String logSamplingMethod = LogSamplingMethod.SEMI_PARAMETRIC;
+    final private static int sampleSize = 10; // n
+    final private static int numberOfSamples = 1; // m
+    final private static LogSamplingMethod logSamplingMethod = LogSamplingMethod.SEMI_PARAMETRIC;
+    final private static GeneralizationMeasure generalizationMeasure = GeneralizationMeasure.ENTROPY_PRECISION;
 
     public static void main(String[] args) {
         EventLog eventLog = new EventLog();
         Model model = new Model();
-        double[] genValue = new BootstrapGen(sampleSize, numberOfSamples, eventLog, logSamplingMethod, model).calculateBootstrapGen();
+        double genValue = new BootstrapGen(sampleSize, numberOfSamples, eventLog, logSamplingMethod, model, generalizationMeasure).calculateBootstrapGen();
 
-        for (double i : genValue) System.out.println(i);
+        System.out.println(genValue);
     }
 
 }

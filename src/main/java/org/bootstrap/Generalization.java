@@ -3,9 +3,7 @@ package org.bootstrap;
 import org.apache.commons.math3.linear.*;
 import org.bootstrap.model.Model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Generalization {
 
@@ -28,7 +26,7 @@ public class Generalization {
      * @return precision value
      */
     double calculateEntropyPrecision(Model model, List<String> log) {
-        return calculateEntropyOfLog(findModelLogIntersection(model.getModel(), log))/calculateEntropyOfModel(model.getModelAsMatrix());
+        return calculateEntropyOfLog(findModelLogIntersection(model.getModel(), log))/calculateEntropyOfModel(getSampleAutomaton());
     }
 
     /**
@@ -47,7 +45,7 @@ public class Generalization {
         } catch (NonSquareMatrixException e) {
             e.printStackTrace();
         }
-        return perronFrobeniusEigenvalue;
+        return Math.log(perronFrobeniusEigenvalue);
     }
 
     /**
@@ -80,7 +78,7 @@ public class Generalization {
      */
     private double[][] shortCircuitModel(double[][] model) {
         // done manually
-        model[5][0] = model[5][0] + 1;
+        model[0][0] = model[0][0] + 1;
         return model;
     }
 
@@ -93,14 +91,17 @@ public class Generalization {
     double calculateEntropyOfLog(List<String> log) {
         int maxTraceLength = 0;
         double limitSup = 0.0;
+        Set<String> uniqueTraces = new HashSet<>();
+
         for (String trace : log) {
+            uniqueTraces.add(trace);
             if (trace.length() > maxTraceLength) {
                 maxTraceLength = trace.length();
             }
         }
         for (int n = 1; n <= maxTraceLength; n++) {
             int count = 0;
-            for (String trace : log) {
+            for (String trace : uniqueTraces) {
                 if (trace.length() == n) {
                     count++;
                 }
@@ -158,6 +159,11 @@ public class Generalization {
             }
         }
         return intersection;
+    }
+
+    private double[][] getSampleAutomaton() {
+        double[][] automaton = { {0, 1, 0, 0, 0, 0}, {0, 0, 1, 0, 1, 0}, {0, 0, 0, 1, 0, 0}, {1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 1}, {1, 0, 0, 0, 0, 1}};
+        return automaton;
     }
 
 }

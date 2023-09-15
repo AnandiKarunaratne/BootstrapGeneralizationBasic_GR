@@ -9,6 +9,10 @@ public class Model {
 
     private final Map<String, List<String>> model = new HashMap<>();
 
+    public Model() {
+        createSampleModel();
+    }
+
     private void createSampleModel() {
         addNode("a");
         addNode("b");
@@ -39,30 +43,6 @@ public class Model {
         }
     }
 
-    public Map<String, List<String>> getModel() {
-        createSampleModel();
-        return model;
-    }
-
-    public double[][] getModelAsMatrix() {
-        createSampleModel();
-        int vertexCount = model.size();
-        String[] nodes = model.keySet().toArray(new String[vertexCount]);
-        double[][] adjacencyMatrix = new double[vertexCount][vertexCount];
-
-        for (int i = 0; i < vertexCount; i++) {
-            String vertex1 = nodes[i];
-            for (int j = 0; j < vertexCount; j++) {
-                String vertex2 = nodes[j];
-                List<String> neighbors = model.get(vertex1);
-                if (neighbors.contains(vertex2)) {
-                    adjacencyMatrix[i][j] = 1;
-                } else {
-                    adjacencyMatrix[i][j] = 0;
-                }
-            }
-        }
-        return adjacencyMatrix;
-    }
+    public Map<String, List<String>> getModel() { return model; }
 
 }
