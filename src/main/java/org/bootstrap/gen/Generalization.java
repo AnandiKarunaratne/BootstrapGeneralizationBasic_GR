@@ -1,4 +1,4 @@
-package org.bootstrap;
+package org.bootstrap.gen;
 
 import org.apache.commons.math3.linear.*;
 import org.bootstrap.model.Model;
@@ -14,7 +14,7 @@ public class Generalization {
      * @param log
      * @return recall value
      */
-    double calculateEntropyRecall(Map<String, List<String>> model, List<String> log) {
+    public double calculateEntropyRecall(Map<String, List<String>> model, List<String> log) {
         return calculateEntropyOfLog(findModelLogIntersection(model, log))/calculateEntropyOfLog(log);
     }
 
@@ -25,7 +25,7 @@ public class Generalization {
      * @param log
      * @return precision value
      */
-    double calculateEntropyPrecision(Model model, List<String> log) {
+    public double calculateEntropyPrecision(Model model, List<String> log) {
         return calculateEntropyOfLog(findModelLogIntersection(model.getModel(), log))/calculateEntropyOfModel(getSampleAutomaton());
     }
 
@@ -108,11 +108,9 @@ public class Generalization {
             }
             if (count > 0) {
                 double logRatio = Math.log(count) / n;
-                if (n == 1) limitSup = logRatio; // initialize the limit superior value with the first value
-                else {
-                    if (logRatio > limitSup) {
-                        limitSup = logRatio;
-                    }
+
+                if (logRatio > limitSup) {
+                    limitSup = logRatio;
                 }
             }
         }
@@ -126,7 +124,7 @@ public class Generalization {
      * @param log
      * @return recall value
      */
-    double calculateRecall(Map<String, List<String>> model, List<String> log) {
+    public double calculateRecall(Map<String, List<String>> model, List<String> log) {
         int matchingEvents = findModelLogIntersection(model, log).size();
         int totalEventsInLog = log.size();
 

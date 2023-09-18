@@ -1,4 +1,4 @@
-package org.bootstrap;
+package org.bootstrap.lsm;
 
 import java.util.ArrayList;
 import java.util.List;

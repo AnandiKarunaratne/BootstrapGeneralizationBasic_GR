@@ -1,4 +1,4 @@
-package org.bootstrap;
+package org.bootstrap.gen;
 
 public enum GeneralizationMeasure {
     RECALL,

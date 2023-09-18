@@ -1,6 +1,10 @@
 package org.bootstrap;
 
+import org.bootstrap.gen.Generalization;
+import org.bootstrap.gen.GeneralizationMeasure;
 import org.bootstrap.log.EventLog;
+import org.bootstrap.lsm.LogBreeding;
+import org.bootstrap.lsm.LogSamplingMethod;
 import org.bootstrap.model.Model;
 
 import java.util.*;
@@ -57,7 +61,7 @@ public class BootstrapGen {
         if (logSamplingMethod == LogSamplingMethod.NON_PARAMETRIC) {
             return log;
         } else if (logSamplingMethod == LogSamplingMethod.SEMI_PARAMETRIC) {
-            int g = 1;
+            int g = 10000;
             int k = 2;
             double p = 1.0;
 

@@ -1,4 +1,4 @@
-package org.bootstrap;
+package org.bootstrap.lsm;
 
 public enum LogSamplingMethod {
     NON_PARAMETRIC,
