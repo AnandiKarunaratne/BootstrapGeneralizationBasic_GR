@@ -160,8 +160,12 @@ public class Generalization {
     }
 
     private double[][] getSampleAutomaton() {
-        double[][] automaton = { {0, 1, 0, 0, 0, 0}, {0, 0, 1, 0, 1, 0}, {0, 0, 0, 1, 0, 0}, {1, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 1}, {1, 0, 0, 0, 0, 1}};
-        return automaton;
+        return new double[][]{{0, 1, 0, 0, 0, 0},
+                              {0, 0, 1, 0, 1, 0},
+                              {0, 0, 0, 1, 0, 0},
+                              {1, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 1},
+                              {1, 0, 0, 0, 0, 1}};
     }
 
 }
