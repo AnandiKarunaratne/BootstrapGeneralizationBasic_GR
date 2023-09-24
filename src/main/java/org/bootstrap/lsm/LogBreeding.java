@@ -1,10 +1,26 @@
 package org.bootstrap.lsm;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+
+import org.bootstrap.utils.SetUtils;
 
 public class LogBreeding {
+
+    public List<String> estimatePopulationWithLogBreeding(List<String> log, int g, int k, double p) {
+        List<String>[] G = new ArrayList[g + 1];
+        G[0] = new ArrayList<>(log);
+
+        // Generate log generations
+        for (int i = 1; i <= g; i++) {
+            G[i] = breedLogs(log, G[i - 1], k, p);
+        }
+
+        List<String> aggregatedLog = new ArrayList<>();
+        for (List<String> bredLog : G) {
+            aggregatedLog = SetUtils.multisetUnion(aggregatedLog, bredLog);
+        }
+        return aggregatedLog;
+    }
 
     /**
      * This method will choose traces from L1 and L2 and breed traces with a probability of p checking for k-overlaps

@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Future Updates: Update this to convert a DFG into a PNML
+ */
 public class Model {
 
     private final Map<String, List<String>> model = new HashMap<>();

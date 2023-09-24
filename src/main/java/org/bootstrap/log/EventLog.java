@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
+/**
+ * Future Updates: Update this to read an XES and convert into a List<String>
+ */
 public class EventLog {
 
     private final List<Event> eventLog = new ArrayList<>();
