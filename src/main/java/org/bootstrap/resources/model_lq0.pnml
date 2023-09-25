@@ -10,29 +10,29 @@
 <place id="p4"><name><text>p4</text></name></place>
 <place id="p5"><name><text>p4</text></name></place>
 <transition id="a"><name><text>a</text></name></transition>
-<transition id="b"><name><text>b</text></name></transition>
+<transition id="b1"><name><text>b</text></name></transition>
+<transition id="b2"><name><text>b</text></name></transition>
 <transition id="c"><name><text>c</text></name></transition>
 <transition id="d"><name><text>d</text></name></transition>
-<transition id="e1"><name><text>e</text></name></transition>
-<transition id="e2"><name><text>e</text></name></transition>
+<transition id="e"><name><text>e</text></name></transition>
 <transition id="f1"><name><text>f</text></name></transition>
 <transition id="f2"><name><text>f</text></name></transition>
 <arc id="arc1" source="p0" target="a"/>
 <arc id="arc2" source="a" target="p1"/>
-<arc id="arc3" source="p1" target="b"/>
-<arc id="arc4" source="b" target="p2"/>
-<arc id="arc5" source="p2" target="c"/>
-<arc id="arc6" source="c" target="p3"/>
-<arc id="arc7" source="p3" target="f1"/>
-<arc id="arc8" source="f1" target="p5"/>
-<arc id="arc9" source="p3" target="f2"/>
-<arc id="arc10" source="f2" target="p0"/>
-<arc id="arc11" source="p1" target="d"/>
-<arc id="arc12" source="d" target="p4"/>
-<arc id="arc13" source="p4" target="e1"/>
-<arc id="arc14" source="e1" target="p4"/>
-<arc id="arc15" source="p4" target="e2"/>
-<arc id="arc16" source="e2" target="p3"/>
+<arc id="arc3" source="p1" target="b1"/>
+<arc id="arc4" source="b1" target="p2"/>
+<arc id="arc5" source="p2" target="b2"/>
+<arc id="arc6" source="b2" target="p2"/>
+<arc id="arc7" source="p2" target="c"/>
+<arc id="arc8" source="c" target="p3"/>
+<arc id="arc9" source="p3" target="f1"/>
+<arc id="arc10" source="f1" target="p5"/>
+<arc id="arc11" source="p3" target="f2"/>
+<arc id="arc12" source="f2" target="p0"/>
+<arc id="arc13" source="p1" target="d"/>
+<arc id="arc14" source="d" target="p4"/>
+<arc id="arc15" source="p4" target="e"/>
+<arc id="arc18" source="e" target="p3"/>
 </page>
 <finalmarkings>
 <marking>
