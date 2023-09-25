@@ -79,10 +79,14 @@ public class EventLog {
     private void generateSampleTraces() {
         for (int i = 0; i < 5; i++) { traceList.add("abbbcf"); }
         for (int i = 0; i < 20; i++) { traceList.add("abcf"); }
-        for (int i = 0; i < 10; i++) { traceList.add("adeef"); }
         for (int i = 0; i < 10; i++) { traceList.add("adefabcfadef"); }
         for (int i = 0; i < 20; i++) { traceList.add("adef"); }
-        traceList.add("addef");
+        for (int i = 0; i < 10; i++) { traceList.add("adefabcf"); }
+        for (int i = 0; i < 10; i++) { traceList.add("abcfadef"); }
+        for (int i = 0; i < 5; i++) { traceList.add("abbcf"); }
+        for (int i = 0; i < 10; i++) { traceList.add("abbcfabcf"); }
+        for (int i = 0; i < 5; i++) { traceList.add("adeef"); }
+        for (int i = 0; i < 5; i++) { traceList.add("abbcfadeef"); }
     }
 
     public List<String> getTraceList() {

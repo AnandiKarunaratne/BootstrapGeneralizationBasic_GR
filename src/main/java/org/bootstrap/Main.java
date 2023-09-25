@@ -4,7 +4,7 @@ import org.bootstrap.log.EventLog;
 import org.bootstrap.lsm.LogSamplingMethod;
 
 public class Main {
-    final private static int sampleSize = 1000000; // n
+    final private static int sampleSize = 100000; // n
     final private static int numberOfSamples = 100; // m
     final private static LogSamplingMethod logSamplingMethod = LogSamplingMethod.SEMI_PARAMETRIC;
 
