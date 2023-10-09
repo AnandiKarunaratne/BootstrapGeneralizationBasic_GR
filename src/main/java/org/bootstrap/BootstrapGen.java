@@ -1,5 +1,7 @@
 package org.bootstrap;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.math3.util.Pair;
 import org.bootstrap.gen.Generalization;
 import org.bootstrap.log.EventLog;
@@ -7,7 +9,8 @@ import org.bootstrap.lsm.LogBreeding;
 import org.bootstrap.lsm.LogSamplingMethod;
 import org.bootstrap.utils.LogUtils;
 
-import java.io.*;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class BootstrapGen {
@@ -15,12 +18,14 @@ public class BootstrapGen {
     private final int numberOfSamples;
     private final List<String> log;
     private final LogSamplingMethod logSamplingMethod;
+    private final String modelFilePath;
 
-    public BootstrapGen(int sampleSize, int numberOfSamples, EventLog eventLog, LogSamplingMethod logSamplingMethod) {
+    public BootstrapGen(int sampleSize, int numberOfSamples, EventLog eventLog, LogSamplingMethod logSamplingMethod, String modelFilePath) {
         this.sampleSize = sampleSize;
         this.numberOfSamples = numberOfSamples;
         this.log = eventLog.getTraceList();
         this.logSamplingMethod = logSamplingMethod;
+        this.modelFilePath = modelFilePath;
     }
 
     /**
@@ -44,11 +49,12 @@ public class BootstrapGen {
             }
             uniqueTraceCount += distinctTraces.size();
 
-            genValueOfSample = generalization.calculateEntropyRecallPrecision();
+            genValueOfSample = generalization.calculateEntropyRecallPrecision(modelFilePath);
             genValuesRecallSum += genValueOfSample.getFirst();
             genValuesPrecisionSum += genValueOfSample.getSecond();
         }
-        System.out.println("Unique Traces: " + (double) uniqueTraceCount/numberOfSamples);
+        writeToCSV(genValuesPrecisionSum/numberOfSamples, genValuesRecallSum/numberOfSamples, (double) uniqueTraceCount/numberOfSamples);
+        System.out.println("\nUnique Traces: " + (double) uniqueTraceCount/numberOfSamples);
         System.out.println("Recall: " + genValuesRecallSum/numberOfSamples);
         System.out.println("Precision: " + genValuesPrecisionSum/numberOfSamples);
     }
@@ -83,6 +89,20 @@ public class BootstrapGen {
         }
         LogUtils.generateXES(sample);
         return sample;
+    }
+
+    private void writeToCSV(double precision, double recall, double traces) {
+        int startIndex = modelFilePath.indexOf("model-") + 6;
+        int endIndex = modelFilePath.lastIndexOf(".");
+        String filePath = "/Users/anandik/Documents/GR/Code/BootstrapGeneralizationBasic_GR/src/main/java/org/bootstrap/resources/output" + modelFilePath.substring(startIndex, endIndex) + ".csv";
+
+        try (FileWriter fileWriter = new FileWriter(filePath, true);
+             CSVPrinter csvPrinter = new CSVPrinter(fileWriter, CSVFormat.DEFAULT)) {
+            String[] values = {Double.toString(precision), Double.toString(recall), Double.toString(traces)};
+            csvPrinter.printRecord(Arrays.asList(values));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
