@@ -68,7 +68,7 @@ public class BootstrapGen {
         if (logSamplingMethod == LogSamplingMethod.NON_PARAMETRIC) {
             return log;
         } else if (logSamplingMethod == LogSamplingMethod.SEMI_PARAMETRIC) {
-            return new LogBreeding().estimatePopulationWithLogBreeding(log, 10000, 2, 1.0);
+            return new LogBreeding().estimatePopulationWithLogBreeding(log, 10, 2, 1.0);
         } else return null;
     }
 
@@ -92,9 +92,15 @@ public class BootstrapGen {
     }
 
     private void writeToCSV(double precision, double recall, double traces) {
-        int startIndex = modelFilePath.indexOf("model-") + 6;
-        int endIndex = modelFilePath.lastIndexOf(".");
-        String filePath = "/Users/anandik/Documents/GR/Code/BootstrapGeneralizationBasic_GR/src/main/java/org/bootstrap/resources/output" + modelFilePath.substring(startIndex, endIndex) + ".csv";
+        int startIndex = modelFilePath.indexOf("model-") + "model-".length();
+        int endIndex = modelFilePath.indexOf("/", startIndex);
+        String logSize = modelFilePath.substring(startIndex, endIndex);
+
+        // Find the index of "-" followed by noise
+        startIndex = modelFilePath.lastIndexOf("-") + 1;
+        int dotIndex = modelFilePath.lastIndexOf(".");
+        String noise = modelFilePath.substring(startIndex, dotIndex);
+        String filePath = "/Users/anandik/Documents/GR/Code/BootstrapGeneralizationBasic_GR/src/main/java/org/bootstrap/resources/outoforder2/output-" + logSize + "-" + noise + ".csv";
 
         try (FileWriter fileWriter = new FileWriter(filePath, true);
              CSVPrinter csvPrinter = new CSVPrinter(fileWriter, CSVFormat.DEFAULT)) {
