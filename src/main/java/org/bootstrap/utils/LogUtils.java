@@ -7,8 +7,8 @@ import java.io.OutputStream;
 import java.util.List;
 
 public class LogUtils {
-    public static void generateXES(List<String> traces) {
-        String filePath = "src/main/java/org/bootstrap/resources/samplelogfile.xes";
+    public static void generateXES(List<String> traces, String filePath) {
+//        String filePath = "/Users/anandik/OneDrive - The University of Melbourne/GR/Code/BootstrapGeneralizationBasic_GR/src/main/java/org/bootstrap/resources/samplelogfile.xes";
         File file = new File(filePath);
         OutputStream outputStream = null;
         String start = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +

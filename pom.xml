@@ -53,14 +53,14 @@
             <version>3.6.1</version>
         </dependency>
         <dependency>
-            <groupId>com.example</groupId>
-            <artifactId>entropia</artifactId>
-            <version>1.0</version>
+            <groupId>org.jbpt</groupId>
+            <artifactId>jbpt-pm</artifactId>
+            <version>0.3.2</version>
         </dependency>
         <dependency>
-            <groupId>com.example</groupId>
-            <artifactId>entropia-petri</artifactId>
-            <version>1.0</version>
+            <groupId>org.jbpt</groupId>
+            <artifactId>jbpt-petri</artifactId>
+            <version>0.3.2</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>

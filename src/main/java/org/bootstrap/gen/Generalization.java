@@ -11,8 +11,8 @@ public class Generalization {
      *
      * @return recall and precision values
      */
-    public Pair<Double, Double> calculateEntropyRecallPrecision(String modelFilePath) throws Exception {
-        Object relevantTraces = QualityMeasuresCLI.parseModel("src/main/java/org/bootstrap/resources/samplelogfile.xes");
+    public Pair<Double, Double> calculateEntropyRecallPrecision(String modelFilePath, String logFilePath) throws Exception {
+        Object relevantTraces = QualityMeasuresCLI.parseModel(logFilePath);
         Object retrievedTraces = QualityMeasuresCLI.parseModel(modelFilePath);
         EntropyPrecisionRecallMeasure epr = new EntropyPrecisionRecallMeasure(relevantTraces, retrievedTraces, 0, 0, true, true, false);
         Pair<Double, Double> result = epr.computeMeasure();
