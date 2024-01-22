@@ -1,91 +1,40 @@
 package org.bootstrap.log;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.text.ParseException;
+import org.utils.files.xes.XESReader;
+import org.utils.log.Trace;
+
 import java.util.*;
 
 /**
  * Future Updates: Update this to read an XES and convert into a List<String>
  */
-public class EventLog {
+public class EventLog extends org.utils.log.EventLog {
 
-    private final List<Event> eventLog = new ArrayList<>();
-    private final List<String> traceList = new ArrayList<>();
+    private List<Trace> traceList = new ArrayList<>();
 
     public EventLog() {
         generateSampleTraces();
     }
 
-    public EventLog(String csvFile) {
-        preProcessCSV(csvFile);
-        generateTraces();
+    public EventLog(String xesFilePath) {
+        this.traceList = new XESReader().readXES(xesFilePath);
     }
 
-    /**
-     * This method will read the CSV file containing the event log,
-     * extract the data and format it into a list of Events (List<Event>)
-     *
-     * @param csvFile : CSV file containing the event log
-     */
-    private void preProcessCSV(String csvFile) {
-        // read CSV
-        String line;
-        String delimiter = ",";
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
-            while ((line = br.readLine()) != null) {
-                // split and add to event log
-                String[] values = line.split(delimiter);
-                // depends on where our caseId, activity, timestamp is defined
-                eventLog.add(new Event(values[0], values[1], values[2]));
-            }
-        } catch (IOException | ParseException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * This method will generate traces using the event log
-     */
-    private void generateTraces() {
-        Map<String, List<Event>> eventMap = new HashMap<>();
-        // group similar caseIds
-        for (Event event : eventLog) {
-            String caseId = event.getCaseId();
-            if (!eventMap.containsKey(caseId)) {
-                eventMap.put(caseId, new ArrayList<>());
-            }
-            eventMap.get(caseId).add(event);
-        }
-
-        for (Map.Entry<String, List<Event>> entry : eventMap.entrySet()) {
-            List<Event> traceEvents = entry.getValue();
-
-            //sort using timestamps
-            traceEvents.sort(Comparator.comparing(Event::getTimestamp));
-
-            // extract trace string
-            StringBuilder stringBuilder = new StringBuilder();
-            for (Event traceEvent : traceEvents) {
-                stringBuilder.append(traceEvent.getActivityName()).append(", ");
-            }
-
-            // Convert the StringBuilder to a final string.
-            traceList.add(stringBuilder.toString());
-        }
+    public EventLog(List<Trace> traces) {
+        super(traces);
+        this.traceList = traces;
     }
 
     private void generateSampleTraces() {
-        for (int i = 0; i < 5; i++) { traceList.add("abbbcf"); }
-        for (int i = 0; i < 20; i++) { traceList.add("abcf"); }
-        for (int i = 0; i < 10; i++) { traceList.add("adeef"); }
-        for (int i = 0; i < 10; i++) { traceList.add("adefabcfadef"); }
-        for (int i = 0; i < 20; i++) { traceList.add("adef"); }
-        traceList.add("addef");
+        for (int i = 0; i < 5; i++) traceList.add(new Trace(Arrays.asList("a", "b", "b", "b", "c", "f")));
+        for (int i = 0; i < 20; i++) traceList.add(new Trace(Arrays.asList("a", "b", "c", "f")));
+        for (int i = 0; i < 10; i++) traceList.add(new Trace(Arrays.asList("a", "d", "e", "e", "f")));
+        for (int i = 0; i < 10; i++) traceList.add(new Trace(Arrays.asList("a", "d", "e", "f", "a", "b", "c", "f", "a", "d", "e", "f")));
+        for (int i = 0; i < 20; i++) traceList.add(new Trace(Arrays.asList("a", "d", "e", "f")));
+        traceList.add(new Trace(Arrays.asList("a", "d", "d", "e", "f")));
     }
 
-    public List<String> getTraceList() {
+    public List<Trace> getTraceList() {
         return traceList;
     }
 
