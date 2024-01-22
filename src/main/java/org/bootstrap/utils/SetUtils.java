@@ -1,12 +1,15 @@
 package org.bootstrap.utils;
 
+import org.utils.log.EventLog;
+import org.utils.log.Trace;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class SetUtils {
-    public static List<String> multisetUnion(List<String> log1, List<String> log2) {
+    public static EventLog multisetUnion(EventLog log1, EventLog log2) {
         log1.addAll(log2);
         return log1;
     }

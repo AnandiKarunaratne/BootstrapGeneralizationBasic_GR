@@ -3,11 +3,13 @@ package org.bootstrap.lsm;
 import java.util.*;
 
 import org.bootstrap.utils.SetUtils;
+import org.utils.log.EventLog;
+import org.utils.log.Trace;
 
 public class LogBreeding {
 
-    public List<String> estimatePopulationWithLogBreeding(List<String> log, int g, int k, double p) {
-        List<String>[] G = new ArrayList[g + 1];
+    public List<Trace> estimatePopulationWithLogBreeding(EventLog log, int g, int k, double p) {
+        List<Trace>[] G = new ArrayList[g + 1];
         G[0] = new ArrayList<>(log);
 
         // Generate log generations
@@ -15,9 +17,9 @@ public class LogBreeding {
             G[i] = breedLogs(log, G[i - 1], k, p);
         }
 
-        List<String> aggregatedLog = new ArrayList<>();
-        for (List<String> bredLog : G) {
-            aggregatedLog = SetUtils.multisetUnion(aggregatedLog, bredLog);
+        List<Trace> aggregatedLog = new ArrayList<>();
+        for (List<Trace> bredLog : G) {
+            aggregatedLog = SetUtils.multisetUnion(new EventLog(aggregatedLog), new EventLog(bredLog));
         }
         return aggregatedLog;
     }
@@ -31,13 +33,13 @@ public class LogBreeding {
      * @param p breeding probability
      * @return List of traces which is a result of breeding L1 and L2
      */
-    public List<String> breedLogs(List<String> L1, List<String> L2, int k, double p) {
-        List<String> bredLog = new ArrayList<>();
+    protected List<Trace> breedLogs(List<Trace> L1, List<Trace> L2, int k, double p) {
+        List<Trace> bredLog = new ArrayList<>();
         Random rand = new Random();
 
         for (int i = 0; i < L1.size() / 2; i++) {
-            String t1 = L1.get(rand.nextInt(L1.size()));
-            String t2 = L2.get(rand.nextInt(L2.size()));
+            Trace t1 = L1.get(rand.nextInt(L1.size()));
+            Trace t2 = L2.get(rand.nextInt(L2.size()));
 
             List<Site> sites = findBreedingSites(t1, t2, k);
 
@@ -45,8 +47,8 @@ public class LogBreeding {
                 int randomIndex = rand.nextInt(sites.size());
                 Site site = sites.get(randomIndex);
 
-                String bredTrace1 = breedTraces(t1, t2, k, site);
-                String bredTrace2 = breedTraces(t2, t1, k, new Site(site.p2, site.p1));
+                Trace bredTrace1 = breedTraces(t1, t2, k, site);
+                Trace bredTrace2 = breedTraces(t2, t1, k, new Site(site.p2, site.p1));
 
                 bredLog.add(bredTrace1);
                 bredLog.add(bredTrace2);
@@ -66,16 +68,18 @@ public class LogBreeding {
      * @param site contains (p1, p2) : positions where crossover operation will be performed
      * @return trace obtained from crossover
      */
-    private String breedTraces(String t1, String t2, int k, Site site) {
+    protected Trace breedTraces(Trace t1, Trace t2, int k, Site site) {
         int prefixEnd = site.p1 + k - 1;
         int suffixStart = site.p2 + k - 1;
 
         // Extract the prefix and suffix substrings
-        String prefix = t1.substring(0, prefixEnd);
-        String suffix = t2.substring(suffixStart);
+        Trace prefix = new Trace(t1.subList(0, prefixEnd));
+        Trace suffix = new Trace(t2.subList(suffixStart, t2.size()));
 
         // Concatenate the prefix and suffix
-        return prefix + suffix;
+        Trace combinedTrace = new Trace(prefix);
+        combinedTrace.addAll(suffix);
+        return combinedTrace;
     }
 
     /**
@@ -85,13 +89,13 @@ public class LogBreeding {
      * @param k legth of subtrace
      * @return list of breeding sites
      */
-    private List<Site> findBreedingSites(String t1, String t2, int k) {
+    protected List<Site> findBreedingSites(Trace t1, Trace t2, int k) {
         List<Site> sites = new ArrayList<>();
         
-        for (int p1 = 1; p1 <= t1.length() - k + 1; p1++) {
-            for (int p2 = 1; p2 <= t2.length() - k + 1; p2++) {
-                String subseq1 = t1.substring(p1 - 1, p1 + k - 1);
-                String subseq2 = t2.substring(p2 - 1, p2 + k - 1);
+        for (int p1 = 1; p1 <= t1.size() - k + 1; p1++) {
+            for (int p2 = 1; p2 <= t2.size() - k + 1; p2++) {
+                Trace subseq1 = new Trace(t1.subList(p1 - 1, p1 + k - 1));
+                Trace subseq2 = new Trace(t2.subList(p2 - 1, p2 + k - 1));
 
                 if (subseq1.equals(subseq2)) {
                     sites.add(new Site(p1, p2));
@@ -101,7 +105,7 @@ public class LogBreeding {
         return sites;
     }
 
-    private static class Site {
+    protected static class Site {
         int p1;
         int p2;
 
