@@ -1,7 +1,9 @@
 package org.bootstrap;
 
+import com.opencsv.exceptions.CsvBadConverterException;
 import org.bootstrap.log.EventLog;
 import org.bootstrap.lsm.LogSamplingMethod;
+import org.bootstrap.utils.CsvUtils;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -33,7 +35,7 @@ public class Main {
                         long startTime = System.currentTimeMillis();
                         double[] result = new BootstrapGen(sampleSize, numberOfSamples, eventLog, logSamplingMethod, modelFilePath, g).calculateGenUsingVariableSamples();
                         long endTime = System.currentTimeMillis();
-                        writeToCsv(prepareCsvRow(log, logSize, "N/A", 0, sampleSizeCo, g, result, endTime - startTime));
+                        CsvUtils.writeToCsv(CsvUtils.prepareCsvRow(log, logSize, "N/A", 0, sampleSizeCo, g, result, endTime - startTime), "./output.csv");
                     }
                 }
             }
@@ -53,38 +55,12 @@ public class Main {
                                 long startTime = System.currentTimeMillis();
                                 double[] result = new BootstrapGen(sampleSize, numberOfSamples, eventLog, logSamplingMethod, modelFilePath, g).calculateGenUsingVariableSamples();
                                 long endTime = System.currentTimeMillis();
-                                writeToCsv(prepareCsvRow(log, logSize, noiseType, noiseLevel, sampleSizeCo, g, result, endTime - startTime));
+                                CsvUtils.writeToCsv(CsvUtils.prepareCsvRow(log, logSize, noiseType, noiseLevel, sampleSizeCo, g, result, endTime - startTime), "./output.csv");
                             }
                         }
                     }
                 }
             }
-        }
-    }
-
-    private static List<String> prepareCsvRow(int log, int logSize, String noiseType, double noiseLevel, int sampleSizeCo, int g, double[] result, double duration) {
-        List<String> csvRow = new ArrayList<>();
-        csvRow.add(String.valueOf(log));
-        csvRow.add(String.valueOf(logSize));
-        csvRow.add(noiseType);
-        csvRow.add(String.valueOf(noiseLevel));
-        csvRow.add(String.valueOf(sampleSizeCo));
-        csvRow.add(String.valueOf(g));
-        for (double value : result) csvRow.add(String.valueOf(value));
-        csvRow.add(String.valueOf(duration));
-        return csvRow;
-    }
-
-    private static void writeToCsv(List<String> rowCsv) {
-        String csvFile = "./output.csv";
-
-        try (FileWriter writer = new FileWriter(csvFile, true)) {
-            StringJoiner joiner = new StringJoiner(",");
-            for (String str : rowCsv) joiner.add(str);
-            writer.append(joiner.toString());
-            writer.append("\n");
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
