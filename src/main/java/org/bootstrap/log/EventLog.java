@@ -1,5 +1,6 @@
 package org.bootstrap.log;
 
+import jdk.jfr.Event;
 import org.utils.files.xes.XESReader;
 import org.utils.log.Trace;
 
@@ -17,7 +18,8 @@ public class EventLog extends org.utils.log.EventLog {
     }
 
     public EventLog(String xesFilePath) {
-        this.traceList = new XESReader().readXES(xesFilePath);
+        List<Trace> traces = new XESReader().readXES(xesFilePath);
+        this.traceList = traces;
     }
 
     public EventLog(List<Trace> traces) {

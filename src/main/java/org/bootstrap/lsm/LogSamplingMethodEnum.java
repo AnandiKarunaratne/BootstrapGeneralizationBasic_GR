@@ -1,6 +1,6 @@
 package org.bootstrap.lsm;
 
-public enum LogSamplingMethod {
+public enum LogSamplingMethodEnum {
     NON_PARAMETRIC,
     SEMI_PARAMETRIC
 }

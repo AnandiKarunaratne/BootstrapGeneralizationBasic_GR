@@ -1,67 +1,60 @@
 package org.bootstrap;
 
-import com.opencsv.exceptions.CsvBadConverterException;
+import org.bootstrap.bootstrap.BootstrapTerminationCriterion;
+import org.bootstrap.bootstrap.BootstrapTerminationCriterionEnum;
 import org.bootstrap.log.EventLog;
 import org.bootstrap.lsm.LogSamplingMethod;
+import org.bootstrap.lsm.LogSamplingMethodEnum;
+import org.bootstrap.lsm.SemiParametricLSM;
 import org.bootstrap.utils.CsvUtils;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
 
 public class Main {
-    final private static int numberOfSamples = 100; // m
-    final private static LogSamplingMethod logSamplingMethod = LogSamplingMethod.SEMI_PARAMETRIC;
+//    final private static int numberOfSamples = 100; // m
+    final private static LogSamplingMethod logSamplingMethod = new SemiParametricLSM(LogSamplingMethodEnum.SEMI_PARAMETRIC, 512, 2, 1.0);
+    static BootstrapTerminationCriterion bootstrapTerminationCriterion = new BootstrapTerminationCriterion(BootstrapTerminationCriterionEnum.CONFIDENCE_INTERVAL, 0.01);
+
 
     public static void main(String[] args) throws Exception {
 
-        int[] logs = {0, 1, 2};
-        int[] logSizes = {100, 200, 300, 400, 500, 600, 700, 800, 900, 1000};
-        double[] noiseLevels = {0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2};
-        int[] sampleSizeCos = {1, 2, 4, 8, 16};
-        int[] G = {25, 50, 100, 200};
-        String[] noiseTypes = {"oa", "ia", "ooo", "all"};
+        for (int k = 0; k <= 2; k++) {
+            for (int logSize = 2; logSize <= 32; logSize *= 2) {
+//                for (int sampleSize = 8; sampleSize <= 4096; sampleSize *= 2) {
+                    String type = "infinite";
+                int sampleSize = 4096;
+                    String logWriteFilePath = "/Users/anandik/Library/CloudStorage/OneDrive-TheUniversityofMelbourne/GR/RQ1/Experiments/BootstrapGenEfficacy/ModelBootstrap/Data/" + type + "-" + logSize + ".xes";
+                    String modelLangFilePath = "/Users/anandik/Library/CloudStorage/OneDrive-TheUniversityofMelbourne/GR/RQ1/Experiments/BootstrapGenEfficacy/ModelBootstrap/Data/" + type + "-model" + logSize + ".xes";
+                    String modelFilePath = "/Users/anandik/Library/CloudStorage/OneDrive-TheUniversityofMelbourne/GR/RQ1/Experiments/Code/BootstrapGeneralizationBasic_GR/src/main/java/org/bootstrap/resources/" + type + "-model.pnml";
 
-        for (int log : logs) {
-            for (int logSize : logSizes) {
-                for (int sampleSizeCo : sampleSizeCos) {
-                    int sampleSize = sampleSizeCo * logSize;
-                    String logFilePath = "/Users/anandik/OneDrive - The University of Melbourne/GR/Experiments/LogQualityV5/Logs/" + log + "-" + logSize + ".xes";
-                    String modelFilePath = "/Users/anandik/OneDrive - The University of Melbourne/GR/Experiments/LogQualityV5/Models/" + log + "-" + logSize + ".pnml";
-                    EventLog eventLog = new EventLog(logFilePath);
-                    for (int g : G) {
-                        long startTime = System.currentTimeMillis();
-                        double[] result = new BootstrapGen(sampleSize, numberOfSamples, eventLog, logSamplingMethod, modelFilePath, g).calculateGenUsingVariableSamples();
-                        long endTime = System.currentTimeMillis();
-                        CsvUtils.writeToCsv(CsvUtils.prepareCsvRow(log, logSize, "N/A", 0, sampleSizeCo, g, result, endTime - startTime), "./output.csv");
-                    }
-                }
+                    long startTime = System.currentTimeMillis();
+                    double[] result = new BootstrapGen(sampleSize, bootstrapTerminationCriterion, new EventLog(logWriteFilePath), logSamplingMethod, modelFilePath).calculateGen();
+                    long endTime = System.currentTimeMillis();
+                    CsvUtils.writeToCsv(prepareCsvRow(type, logSize, "N/A", 0.0, sampleSize, 512, result, endTime - startTime), "./output-model-bootstrap-test.csv");
+
+//                    long startTime = System.currentTimeMillis();
+//                    double[] result = new BootstrapGen(sampleSize, 128, new EventLog(logWriteFilePath), logSamplingMethod, modelFilePath, 512).calculateGenUsingVariableSamples();
+//                    long endTime = System.currentTimeMillis();
+//                    CsvUtils.writeToCsv(prepareCsvRow(type, logSize, "N/A", 0.0, sampleSize, 512, result, endTime - startTime), "./output-model-bootstrap-test.csv");
+//                }
             }
         }
 
+    }
 
-        for (int log : logs) {
-            for (int logSize : logSizes) {
-                for (String noiseType : noiseTypes) {
-                    for (double noiseLevel : noiseLevels) {
-                        for (int sampleSizeCo : sampleSizeCos) {
-                            int sampleSize = sampleSizeCo * logSize;
-                            String logFilePath = "/Users/anandik/OneDrive - The University of Melbourne/GR/Experiments/LogQualityV5/Logs/" + log + "-" + logSize + "-" + noiseType + "-" + noiseLevel + ".xes";
-                            String modelFilePath = "/Users/anandik/OneDrive - The University of Melbourne/GR/Experiments/LogQualityV5/Models/" + log + "-" + logSize + "-" + noiseType + "-" + noiseLevel + ".pnml";
-                            EventLog eventLog = new EventLog(logFilePath);
-                            for (int g : G) {
-                                long startTime = System.currentTimeMillis();
-                                double[] result = new BootstrapGen(sampleSize, numberOfSamples, eventLog, logSamplingMethod, modelFilePath, g).calculateGenUsingVariableSamples();
-                                long endTime = System.currentTimeMillis();
-                                CsvUtils.writeToCsv(CsvUtils.prepareCsvRow(log, logSize, noiseType, noiseLevel, sampleSizeCo, g, result, endTime - startTime), "./output.csv");
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    private static List<String> prepareCsvRow(String log, int logSize, String noiseType, double noiseLevel, int sampleSize, int g, double[] result, double duration) {
+        List<String> csvRow = new ArrayList<>();
+        csvRow.add(log);
+//        csvRow.add(String.valueOf(bootstrapped));
+        csvRow.add(String.valueOf(logSize));
+        csvRow.add(noiseType);
+        csvRow.add(String.valueOf(noiseLevel));
+        csvRow.add(String.valueOf(sampleSize));
+        csvRow.add(String.valueOf(g));
+        for (double value : result) csvRow.add(String.valueOf(value));
+        csvRow.add(String.valueOf(duration));
+        return csvRow;
     }
 
 }
