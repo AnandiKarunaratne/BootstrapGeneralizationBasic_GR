@@ -22,13 +22,15 @@ public class BootstrapGen {
     private final String modelFilePath;
     private final String sampleFilePath = "./src/main/java/org/bootstrap/resources/samplelogfile.xes";
     private final BootstrapTerminationCriterion bootstrapTerminationCriterion;
+    private final boolean bootstrapModel;
 
-    public BootstrapGen(int sampleSize, BootstrapTerminationCriterion bootstrapTerminationCriterion, EventLog eventLog, LogSamplingMethod logSamplingMethod, String modelFilePath) {
+    public BootstrapGen(int sampleSize, BootstrapTerminationCriterion bootstrapTerminationCriterion, EventLog eventLog, LogSamplingMethod logSamplingMethod, boolean bootstrapModel, String modelFilePath) {
         this.sampleSize = sampleSize;
         this.bootstrapTerminationCriterion = bootstrapTerminationCriterion;
         this.log = eventLog.getTraceList();
         this.logSamplingMethod = logSamplingMethod;
         this.modelFilePath = modelFilePath;
+        this.bootstrapModel = bootstrapModel;
     }
 
     public double[] calculateGen() {
@@ -57,11 +59,23 @@ public class BootstrapGen {
             Set<Trace> distinctTraces = new HashSet<>(sample);
             uniqueTraceCount += distinctTraces.size();
 
-            try {
-                genValueOfSample = generalization.calculateEntropyRecallPrecision(modelFilePath, sampleFilePath);
-                genValues.add(genValueOfSample);
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (bootstrapModel) {
+                // generate a sample from the model language
+                String sampleModelFilePath = "./src/main/java/org/bootstrap/resources/samplemodellogfile.xes";
+                generateSample(new EventLog(modelFilePath).getTraceList(), sampleModelFilePath);
+                try {
+                    genValueOfSample = generalization.calculateEntropyRecallPrecision(sampleModelFilePath, sampleFilePath);
+                    genValues.add(genValueOfSample);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    genValueOfSample = generalization.calculateEntropyRecallPrecision(modelFilePath, sampleFilePath);
+                    genValues.add(genValueOfSample);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             confidenceIntervalHighest = (genValues.size() >= 2) ? calculateHighestConfidenceInterval(genValues) : confidenceIntervalHighest;
@@ -86,12 +100,25 @@ public class BootstrapGen {
             Set<Trace> distinctTraces = new HashSet<>(sample);
             uniqueTraceCount += distinctTraces.size();
 
-            try {
-                genValueOfSample = generalization.calculateEntropyRecallPrecision(modelFilePath, sampleFilePath);
-                genValuesRecallSum += genValueOfSample.getFirst();
-                genValuesPrecisionSum += genValueOfSample.getSecond();
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (bootstrapModel) {
+                // generate a sample from the model language
+                String sampleModelFilePath = "./src/main/java/org/bootstrap/resources/samplemodellogfile.xes";
+                generateSample(new EventLog(modelFilePath).getTraceList(), sampleModelFilePath);
+                try {
+                    genValueOfSample = generalization.calculateEntropyRecallPrecision(sampleModelFilePath, sampleFilePath);
+                    genValuesRecallSum += genValueOfSample.getFirst();
+                    genValuesPrecisionSum += genValueOfSample.getSecond();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    genValueOfSample = generalization.calculateEntropyRecallPrecision(modelFilePath, sampleFilePath);
+                    genValuesRecallSum += genValueOfSample.getFirst();
+                    genValuesPrecisionSum += genValueOfSample.getSecond();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         return new double[]{ genValuesPrecisionSum/numberOfSamples, genValuesRecallSum/numberOfSamples, (double) uniqueTraceCount/numberOfSamples};

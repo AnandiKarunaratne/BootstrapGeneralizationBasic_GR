@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class BootstrapGenTest {
 
@@ -31,7 +30,7 @@ public class BootstrapGenTest {
     public void testCalculateGen() {
         BootstrapTerminationCriterion bootstrapTerminationCriterion = new BootstrapTerminationCriterion(BootstrapTerminationCriterionEnum.FIXED_SAMPLES, 10);
         LogSamplingMethod logSamplingMethod = new SemiParametricLSM(LogSamplingMethodEnum.SEMI_PARAMETRIC, 10000, 2, 1.0);
-        BootstrapGen bootstrapGen = new BootstrapGen(100000, bootstrapTerminationCriterion, new EventLog(), logSamplingMethod, modelFilePath);
+        BootstrapGen bootstrapGen = new BootstrapGen(100000, bootstrapTerminationCriterion, new EventLog(), logSamplingMethod, false, modelFilePath);
         double[] result = bootstrapGen.calculateGen();
 
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
@@ -41,7 +40,7 @@ public class BootstrapGenTest {
         assertEquals("0.89", pre);
         assertEquals("0.91", rec);
 
-        bootstrapGen = new BootstrapGen(100000, bootstrapTerminationCriterion, new EventLog(), logSamplingMethod, modelFilePath);
+        bootstrapGen = new BootstrapGen(100000, this.bootstrapTerminationCriterion, new EventLog(), logSamplingMethod, false, modelFilePath);
         result = bootstrapGen.calculateGen();
 
         pre = decimalFormat.format(result[0]);
@@ -54,11 +53,11 @@ public class BootstrapGenTest {
     @Test
     public void testEstimatePopulation() {
         LogSamplingMethod logSamplingMethod = new NonParametricLSM(LogSamplingMethodEnum.NON_PARAMETRIC);
-        BootstrapGen bootstrapGenNP = new BootstrapGen(sampleSize, bootstrapTerminationCriterion, eventLog, logSamplingMethod, modelFilePath);
+        BootstrapGen bootstrapGenNP = new BootstrapGen(sampleSize, bootstrapTerminationCriterion, eventLog, logSamplingMethod, false, modelFilePath);
         List<Trace> resultNP = bootstrapGenNP.estimatePopulation(eventLog);
         assertEquals(eventLog.getTraceList(), resultNP);
 
-        BootstrapGen bootstrapGenSP = new BootstrapGen(sampleSize, bootstrapTerminationCriterion, eventLog, this.logSamplingMethod, modelFilePath);
+        BootstrapGen bootstrapGenSP = new BootstrapGen(sampleSize, bootstrapTerminationCriterion, eventLog, this.logSamplingMethod, false, modelFilePath);
         List<Trace> resultSP = bootstrapGenSP.estimatePopulation(eventLog);
         assertEquals(eventLog.size() * (g + 1), resultSP.size());
     }

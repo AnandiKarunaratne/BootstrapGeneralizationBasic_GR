@@ -20,7 +20,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
         for (int k = 0; k <= 2; k++) {
-            for (int logSize = 2; logSize <= 32; logSize *= 2) {
+            for (int logSize = 64; logSize <= 1024; logSize *= 2) {
 //                for (int sampleSize = 8; sampleSize <= 4096; sampleSize *= 2) {
                     String type = "infinite";
                 int sampleSize = 4096;
@@ -29,24 +29,24 @@ public class Main {
                     String modelFilePath = "/Users/anandik/Library/CloudStorage/OneDrive-TheUniversityofMelbourne/GR/RQ1/Experiments/Code/BootstrapGeneralizationBasic_GR/src/main/java/org/bootstrap/resources/" + type + "-model.pnml";
 
                     long startTime = System.currentTimeMillis();
-                    double[] result = new BootstrapGen(sampleSize, bootstrapTerminationCriterion, new EventLog(logWriteFilePath), logSamplingMethod, modelFilePath).calculateGen();
+                    double[] result = new BootstrapGen(sampleSize, bootstrapTerminationCriterion, new EventLog(logWriteFilePath), logSamplingMethod, false, modelFilePath).calculateGen();
                     long endTime = System.currentTimeMillis();
-                    CsvUtils.writeToCsv(prepareCsvRow(type, logSize, "N/A", 0.0, sampleSize, 512, result, endTime - startTime), "./output-model-bootstrap-test.csv");
+                    CsvUtils.writeToCsv(prepareCsvRow(type, false, logSize, "N/A", 0.0, sampleSize, 512, result, endTime - startTime), "./output-model-bootstrap-test1.csv");
 
-//                    long startTime = System.currentTimeMillis();
-//                    double[] result = new BootstrapGen(sampleSize, 128, new EventLog(logWriteFilePath), logSamplingMethod, modelFilePath, 512).calculateGenUsingVariableSamples();
-//                    long endTime = System.currentTimeMillis();
-//                    CsvUtils.writeToCsv(prepareCsvRow(type, logSize, "N/A", 0.0, sampleSize, 512, result, endTime - startTime), "./output-model-bootstrap-test.csv");
+                    startTime = System.currentTimeMillis();
+                    result = new BootstrapGen(sampleSize, bootstrapTerminationCriterion, new EventLog(logWriteFilePath), logSamplingMethod, true, modelLangFilePath).calculateGen();
+                    endTime = System.currentTimeMillis();
+                    CsvUtils.writeToCsv(prepareCsvRow(type, true, logSize, "N/A", 0.0, sampleSize, 512, result, endTime - startTime), "./output-model-bootstrap-test1.csv");
 //                }
             }
         }
 
     }
 
-    private static List<String> prepareCsvRow(String log, int logSize, String noiseType, double noiseLevel, int sampleSize, int g, double[] result, double duration) {
+    private static List<String> prepareCsvRow(String log, boolean bootstrapped, int logSize, String noiseType, double noiseLevel, int sampleSize, int g, double[] result, double duration) {
         List<String> csvRow = new ArrayList<>();
         csvRow.add(log);
-//        csvRow.add(String.valueOf(bootstrapped));
+        csvRow.add(String.valueOf(bootstrapped));
         csvRow.add(String.valueOf(logSize));
         csvRow.add(noiseType);
         csvRow.add(String.valueOf(noiseLevel));
