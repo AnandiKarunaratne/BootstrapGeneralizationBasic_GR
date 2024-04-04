@@ -13,9 +13,7 @@ public class EventLog extends org.utils.log.EventLog {
 
     private List<Trace> traceList = new ArrayList<>();
 
-    public EventLog() {
-        generateSampleTraces();
-    }
+    public EventLog() {}
 
     public EventLog(String xesFilePath) {
         List<Trace> traces = new XESReader().readXES(xesFilePath);
@@ -27,7 +25,7 @@ public class EventLog extends org.utils.log.EventLog {
         this.traceList = traces;
     }
 
-    private void generateSampleTraces() {
+    public void generateSampleTraces() {
         for (int i = 0; i < 5; i++) traceList.add(new Trace(Arrays.asList("a", "b", "b", "b", "c", "f")));
         for (int i = 0; i < 20; i++) traceList.add(new Trace(Arrays.asList("a", "b", "c", "f")));
         for (int i = 0; i < 10; i++) traceList.add(new Trace(Arrays.asList("a", "d", "e", "e", "f")));

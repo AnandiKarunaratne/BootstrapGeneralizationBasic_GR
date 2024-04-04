@@ -3,10 +3,13 @@ package org.bootstrap;
 import org.bootstrap.bootstrap.BootstrapTerminationCriterion;
 import org.bootstrap.bootstrap.BootstrapTerminationCriterionEnum;
 import org.bootstrap.log.EventLog;
+import org.bootstrap.log.EventLogOps;
 import org.bootstrap.lsm.LogSamplingMethod;
 import org.bootstrap.lsm.LogSamplingMethodEnum;
 import org.bootstrap.lsm.SemiParametricLSM;
 import org.bootstrap.utils.CsvUtils;
+import org.jbpt.petri.NetSystem;
+import org.jbpt.petri.io.PNMLSerializer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,28 +22,57 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        for (int k = 0; k <= 2; k++) {
-            for (int logSize = 64; logSize <= 1024; logSize *= 2) {
-//                for (int sampleSize = 8; sampleSize <= 4096; sampleSize *= 2) {
-                    String type = "infinite";
-                int sampleSize = 4096;
-                    String logWriteFilePath = "/Users/anandik/Library/CloudStorage/OneDrive-TheUniversityofMelbourne/GR/RQ1/Experiments/BootstrapGenEfficacy/ModelBootstrap/Data/" + type + "-" + logSize + ".xes";
-                    String modelLangFilePath = "/Users/anandik/Library/CloudStorage/OneDrive-TheUniversityofMelbourne/GR/RQ1/Experiments/BootstrapGenEfficacy/ModelBootstrap/Data/" + type + "-model" + logSize + ".xes";
-                    String modelFilePath = "/Users/anandik/Library/CloudStorage/OneDrive-TheUniversityofMelbourne/GR/RQ1/Experiments/Code/BootstrapGeneralizationBasic_GR/src/main/java/org/bootstrap/resources/" + type + "-model.pnml";
+        String basePath = "/Users/anandik/Library/CloudStorage/OneDrive-TheUniversityofMelbourne/GR/RQ1/Experiments/BootstrapGenEfficacy/ModelBootstrap/";
+        String[] inputSystemsPnml = CsvUtils.readCSV(basePath + "inputs.csv");
+        int[] logSizes = {64, 128, 256, 512, 1024};
+
+        for (String inputSystemPnml : inputSystemsPnml) {
+            String inputSystem = inputSystemPnml.substring(0, inputSystemPnml.indexOf("pnml"));
+            String systemFilePath = basePath + "systems/" + inputSystemPnml;
+            String modelFilePath = basePath + "models/" + inputSystem + "128.0.pnml";
+            String systemLogBaseFilePath = basePath + "system-logs/" + inputSystem;
+            String modelLogBaseFilePath = basePath + "model-logs/" + inputSystem;
+
+            createInputLogs(systemFilePath, logSizes, systemLogBaseFilePath);
+            createInputLogs(modelFilePath, logSizes, modelLogBaseFilePath);
+
+            for (int logSize : logSizes) {
+                for (int sampleSize = 256; sampleSize <= 4096; sampleSize *= 2) {
+                    EventLog systemLog = new EventLog(systemLogBaseFilePath + logSize + ".xes");
+                    String modelLogFilePath = modelLogBaseFilePath + logSize + ".xes";
 
                     long startTime = System.currentTimeMillis();
-                    double[] result = new BootstrapGen(sampleSize, bootstrapTerminationCriterion, new EventLog(logWriteFilePath), logSamplingMethod, false, modelFilePath).calculateGen();
+                    double[] result = new BootstrapGen(sampleSize, bootstrapTerminationCriterion, systemLog, logSamplingMethod, false, modelFilePath).calculateGen();
                     long endTime = System.currentTimeMillis();
-                    CsvUtils.writeToCsv(prepareCsvRow(type, false, logSize, "N/A", 0.0, sampleSize, 512, result, endTime - startTime), "./output-model-bootstrap-test1.csv");
+                    CsvUtils.writeToCsv(prepareCsvRow(inputSystem, false, logSize, "N/A", 0.0, sampleSize, 512, result, endTime - startTime), "./output-model-bootstrap-60.csv");
 
                     startTime = System.currentTimeMillis();
-                    result = new BootstrapGen(sampleSize, bootstrapTerminationCriterion, new EventLog(logWriteFilePath), logSamplingMethod, true, modelLangFilePath).calculateGen();
+                    result = new BootstrapGen(sampleSize, bootstrapTerminationCriterion, systemLog, logSamplingMethod, true, modelLogFilePath).calculateGen();
                     endTime = System.currentTimeMillis();
-                    CsvUtils.writeToCsv(prepareCsvRow(type, true, logSize, "N/A", 0.0, sampleSize, 512, result, endTime - startTime), "./output-model-bootstrap-test1.csv");
-//                }
+                    CsvUtils.writeToCsv(prepareCsvRow(inputSystem, true, logSize, "N/A", 0.0, sampleSize, 512, result, endTime - startTime), "./output-model-bootstrap-60.csv");
+                }
             }
         }
 
+    }
+
+    private static void createInputLogs(String netSystemFilePath, int[] logSizes, String logBaseFilePath) {
+        EventLog prevLog = new EventLog();
+        int prevLogSize = 0;
+        for (int logSize : logSizes) {
+            System.out.println(prevLog.size());
+            int numOfTracesToGenerate = logSize - prevLogSize;
+            EventLog generatedLog = createInputLog(netSystemFilePath, numOfTracesToGenerate);
+            prevLog.addAll(generatedLog);
+            prevLog.serializeEventLog(logBaseFilePath + logSize + ".xes");
+            prevLogSize = logSize;
+        }
+    }
+
+    private static EventLog createInputLog(String netSystemFilePath, int logSize) {
+        PNMLSerializer pnmlSerializer = new PNMLSerializer();
+        NetSystem netSystem = pnmlSerializer.parse(netSystemFilePath);
+        return new EventLogOps().sampleRandomLog(netSystem, logSize);
     }
 
     private static List<String> prepareCsvRow(String log, boolean bootstrapped, int logSize, String noiseType, double noiseLevel, int sampleSize, int g, double[] result, double duration) {

@@ -30,7 +30,9 @@ public class BootstrapGenTest {
     public void testCalculateGen() {
         BootstrapTerminationCriterion bootstrapTerminationCriterion = new BootstrapTerminationCriterion(BootstrapTerminationCriterionEnum.FIXED_SAMPLES, 10);
         LogSamplingMethod logSamplingMethod = new SemiParametricLSM(LogSamplingMethodEnum.SEMI_PARAMETRIC, 10000, 2, 1.0);
-        BootstrapGen bootstrapGen = new BootstrapGen(100000, bootstrapTerminationCriterion, new EventLog(), logSamplingMethod, false, modelFilePath);
+        EventLog log = new EventLog();
+        log.generateSampleTraces();
+        BootstrapGen bootstrapGen = new BootstrapGen(100000, bootstrapTerminationCriterion, log, logSamplingMethod, false, modelFilePath);
         double[] result = bootstrapGen.calculateGen();
 
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
@@ -40,7 +42,7 @@ public class BootstrapGenTest {
         assertEquals("0.89", pre);
         assertEquals("0.91", rec);
 
-        bootstrapGen = new BootstrapGen(100000, this.bootstrapTerminationCriterion, new EventLog(), logSamplingMethod, false, modelFilePath);
+        bootstrapGen = new BootstrapGen(100000, this.bootstrapTerminationCriterion, log, logSamplingMethod, false, modelFilePath);
         result = bootstrapGen.calculateGen();
 
         pre = decimalFormat.format(result[0]);

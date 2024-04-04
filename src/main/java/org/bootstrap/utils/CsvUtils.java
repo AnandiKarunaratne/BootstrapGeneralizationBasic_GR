@@ -1,5 +1,7 @@
 package org.bootstrap.utils;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,5 +19,23 @@ public class CsvUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String[] readCSV(String csvFile) {
+        List<String> entriesList = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                entriesList.add(line); // Add each line to the list
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String[] entries = new String[entriesList.size()];
+        entries = entriesList.toArray(entries);
+
+        return entries;
     }
 }
